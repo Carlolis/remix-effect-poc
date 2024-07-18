@@ -1,0 +1,16 @@
+{
+  "Schema": {
+    "prefix": "+SC",
+    "body": [
+      "import * as Sc from '@effect/schema/Schema'"
+    ],
+    "description": "Schema as Sc"
+  },
+  "Option": {
+    "prefix": "+O",
+    "body": [
+      "import * as O from 'effect/Option'"
+    ],
+    "description": "Option as O"
+  },
+}

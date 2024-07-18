@@ -1,48 +1,39 @@
-import type { MetaFunction } from "@remix-run/node";
+import { CustomButton } from '~/components/CustomButton';
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
-  ];
-};
+
+
+
+
 
 export default function Index() {
   return (
-    <div className="font-sans p-4">
-      <h1 className="text-3xl">Welcome to Remix</h1>
-      <ul className="list-disc mt-4 pl-6 space-y-2">
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/start/quickstart"
-            rel="noreferrer"
-          >
-            5m Quick Start
-          </a>
-        </li>
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/start/tutorial"
-            rel="noreferrer"
-          >
-            30m Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/docs"
-            rel="noreferrer"
-          >
-            Remix Docs
-          </a>
-        </li>
-      </ul>
+    <div
+      style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4', marginTop: '20px' }}
+      className="flex flex-col items-center justify-center"
+    >
+      <div className="space-y-4 text-center">
+        <div>Welcome to POC</div>
+        <div className="flex flex-col items-center space-y-2">
+          <CustomButton to="/dashboard">
+            Dashboard
+          </CustomButton> 
+          <CustomButton to="/signup">
+            SIGN-UP
+          </CustomButton>
+          <CustomButton to="/login">
+            LOGIN
+          </CustomButton>
+          <CustomButton to="/projects">
+            YOUR PROJECTS
+          </CustomButton>
+          <CustomButton to="/createTicket">
+            CREATE A TICKET
+          </CustomButton>
+          <CustomButton to="/tickets">
+            YOUR TICKETS
+          </CustomButton>
+        </div>
+      </div>
     </div>
-  );
+  )
 }
