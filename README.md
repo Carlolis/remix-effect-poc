@@ -5,25 +5,13 @@
 ## Install dependencies with bun (install bun globally first)
 
 ```bash
-bun install
-```
-
-or
-
-```bash
 bun i
 ```
 
 ## Run dev server with bun
 
 ```bash
-bun nx serve myapp
-```
-
-or
-
-```bash
-bun myapp
+bun dev
 ```
 
 ## Configure docker with docker-compose
@@ -76,13 +64,7 @@ Note over RemixAppFront,RemixAppBack: Optional: Refresh token mechanism can be i
 ### Run tests with bun
 
 ```bash
-bun nx test myapp --watch
-```
-
-or
-
-```bash
-bun nx test myapp
+bun test-vite
 ```
 
 ### Notion Links
