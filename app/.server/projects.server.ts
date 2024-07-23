@@ -4,9 +4,9 @@ import { redirect } from "@remix-run/node";
 import { pipe, Effect as T } from "effect";
 
 import { JwtUserInfo } from "../routes/callback";
-import { unwrapLoader } from "../runtime/Remix";
 import { UserManagement } from "../services/userManagement/UserManagement";
 import { getSession } from "../session";
+import { unwrapLoader } from "~/runtime/Remix";
 
 export const loader = T.gen(function* () {
   const userManagement = yield* UserManagement;
@@ -38,4 +38,4 @@ export const loader = T.gen(function* () {
       )
     )
   );
-});
+}).pipe(unwrapLoader);
