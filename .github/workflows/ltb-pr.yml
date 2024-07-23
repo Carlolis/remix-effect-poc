@@ -1,0 +1,39 @@
+name: (PR) Lint, Test & Build
+
+on:
+  pull_request:
+    branches:
+      - pr/**
+
+env:
+  NODE_OPTIONS: "--max_old_space_size=8196"
+
+jobs:
+  lint:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout [main]
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/install-dependencies
+      - run: bun lint
+  build:
+    timeout-minutes: 15
+    permissions:
+      id-token: write
+      contents: write
+      security-events: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout [main]
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/install-dependencies
+
+      - run: bun run build
+
+

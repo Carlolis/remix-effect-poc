@@ -1,0 +1,32 @@
+name: (main) Lint, Test & Build
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  NODE_OPTIONS: "--max_old_space_size=8196"
+
+jobs:
+  lint:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout [main]
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/install-dependencies
+      - run: bun lint
+  build:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout [main]
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/install-dependencies
+      - run: bun run build
