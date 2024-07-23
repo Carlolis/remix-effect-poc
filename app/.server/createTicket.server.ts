@@ -7,7 +7,7 @@ import { JwtUserInfo } from "../routes/callback";
 import { Remix } from "../runtime/Remix";
 import { TicketService } from "../services/ticketService/TicketService";
 import { commitSession, getSession } from "../session";
-
+ 
 export const loader = Remix.unwrapLoader(
   T.succeed(
     T.gen(function* () {

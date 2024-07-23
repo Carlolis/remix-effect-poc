@@ -3,6 +3,7 @@ import { createCookieSessionStorage } from '@remix-run/node'
 // export the whole sessionStorage object
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
+    //FIXME : change this in prod
     maxAge: 60 * 60 * 24 * 365, // 1 year
     name: '_session', // use any name you want here
     sameSite: 'lax', // this helps with CSRF

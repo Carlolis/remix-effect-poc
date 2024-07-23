@@ -15,12 +15,11 @@ export const loader = Remix.loader(
       .schemaHeaders(Sc.Struct({ cookie: Sc.optional(Sc.String) }))
       .pipe(
         T.flatMap(({ cookie }) => T.tryPromise(() => getSession(cookie))),
-
         T.catchAll(() => T.tryPromise(() => getSession()))
       );
 
     const userName: string | undefined = pipe(
-      session.get("username"),
+      session.get("username"), 
       Sc.decodeUnknownOption(Sc.String),
       O.getOrUndefined
     );

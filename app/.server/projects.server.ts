@@ -21,7 +21,7 @@ export const loader = T.gen(function* () {
     const userInfo = yield* pipe(
       session.get("user_info"),
       Sc.decodeUnknown(JwtUserInfo)
-    );
+    ); 
 
     const projects = yield* userManagement.getUserProjectsWithRoles(
       userInfo.sub
