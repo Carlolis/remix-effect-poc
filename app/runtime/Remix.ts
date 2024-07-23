@@ -12,7 +12,7 @@ import type {
 import {
   Cause,
   Context,
-  Effect,
+  Effect as T,
   Exit,
   Layer,
   ManagedRuntime,
@@ -31,6 +31,7 @@ import {
   type Redirect,
 } from './ServerResponse'
 import { fromWeb, ServerRequest } from '@effect/platform/Http/ServerRequest'
+import { CookieSessionStorage } from './services/CookieSessionStorage'
 
 // import { OAuth } from "./internals/oauth/OAuth";
 
@@ -59,17 +60,18 @@ type RequestEnv =
   | Scope.Scope
   | Path.Path
   | ResponseHeaders
+  | CookieSessionStorage
 
 type ActionError = Redirect | Unexpected | FormError | ParseError
 
-type RemixActionHandler<A, R,> = Effect.Effect<
+type RemixActionHandler<A, R,> = T.Effect<
   A,
   ActionError,
   R | AppEnv | RequestEnv
 >
 type LoaderError = Redirect | NotFound | Unexpected | NoSuchElementException
 
-type RemixLoaderHandler<A extends Serializable, R,> = Effect.Effect<
+type RemixLoaderHandler<A extends Serializable, R,> = T.Effect<
   A,
   LoaderError,
   R | AppEnv | RequestEnv
@@ -137,8 +139,8 @@ export const action = <A extends DataFunctionReturnValue, R extends AppEnv | Req
 ) =>
   unstable_defineAction(args => {
     const runnable = effect.pipe(
-      Effect.tapError(e =>
-        Effect.sync(() =>
+      T.tapError(e =>
+        T.sync(() =>
           matchActionError({
             Unexpected: () => (args.response.status = 500),
             FormError: () => (args.response.status = 400),
@@ -151,10 +153,12 @@ export const action = <A extends DataFunctionReturnValue, R extends AppEnv | Req
           })(e)
         )
       ),
-      Effect.catchTag('FormError', e => Effect.succeed(e.toJSON())), // TODO: map FormError to ErrorResponse
-      Effect.provide(makeRequestContext(args)),
-      Effect.scoped,
-      Effect.exit
+      T.catchTag('FormError', e => T.succeed(e.toJSON())), // TODO: map FormError to ErrorResponse
+
+      T.provide(CookieSessionStorage.layer),
+      T.provide(makeRequestContext(args)),
+      T.scoped,
+      T.exit
     )
 
     return runtime.runPromise(runnable).then(Exit.getOrElse(handleFailedResponse)) as Promise<
@@ -168,8 +172,8 @@ export const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
   // @ts-expect-error toto
   unstable_defineLoader(args => {
     const runnable = effect.pipe(
-      Effect.tapError(e =>
-        Effect.sync(() =>
+      T.tapError(e =>
+        T.sync(() =>
           matchLoaderError({
             Unexpected: () => (args.response.status = 500),
             NotFound: () => (args.response.status = 404),
@@ -181,9 +185,10 @@ export const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
           })(e)
         )
       ),
-      Effect.scoped,
-      Effect.provide(makeRequestContext(args)),
-      Effect.exit
+      T.scoped,
+      T.provide(CookieSessionStorage.layer),
+      T.provide(makeRequestContext(args)),
+      T.exit
     )
 
     return runtime.runPromise(runnable).then(
@@ -206,7 +211,7 @@ export const unwrapLoader = <
   E,
   R2 extends AppEnv,
 >(
-  effect: Effect.Effect<RemixLoaderHandler<A1, R1>, E, R2>
+  effect: T.Effect<RemixLoaderHandler<A1, R1>, E, R2>
 ) => {
   const awaitedHandler = runtime.runPromise(effect).then(loader)
 
@@ -223,7 +228,7 @@ export const unwrapAction = <
   E,
   R2 extends AppEnv,
 >(
-  effect: Effect.Effect<RemixActionHandler<A1, R1>, E, R2>
+  effect: T.Effect<RemixActionHandler<A1, R1>, E, R2>
 ) => {
   const awaitedHandler = runtime.runPromise(effect).then(action)
 

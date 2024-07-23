@@ -14,11 +14,13 @@ import { OpenIdClientLayer } from '../services/userManagement/implementations/zi
 import { makeZitadelImplementation } from '../services/userManagement/implementations/zitadel/Zitadelimplementations'
 
 
+
 export const AppLayer = pipe(
   makeZammadImplementation,
   L.provideMerge(makeZitadelImplementation),
-  L.provide(Http.client.layer),
+
   L.provideMerge(OpenIdClientLayer),
   L.provideMerge(NodeFileSystem.layer),
-  L.provideMerge(Path.layer)
+  L.provideMerge(Path.layer),
+  L.provide(Http.client.layer),
 ).pipe(Layer.provide(Logger.minimumLogLevel(LogLevel.All)))

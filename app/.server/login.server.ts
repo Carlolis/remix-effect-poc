@@ -3,10 +3,10 @@ import * as Sc from "@effect/schema/Schema";
 
 import { Effect as T, pipe } from "effect";
 import * as O from "effect/Option";
-import { ServerResponse } from "~/runtime/ServerResponse";
+import { CookieSessionStorage } from '~/runtime/services/CookieSessionStorage';
 import { Remix } from "../runtime/Remix";
 import { UserManagement } from "../services/userManagement/UserManagement";
-import { commitSession, getSession } from "../session";
+import { getSession } from "../session";
 
 // loader
 export const loader = Remix.loader(
@@ -35,22 +35,9 @@ export const action = Remix.action(
     const { codeVerifier, nonce, authorizationUrl } =
       yield* userManagement.login;
 
-    const session = yield* HttpServer.request
-      .schemaHeaders(Sc.Struct({ cookie: Sc.String }))
-      .pipe(
-        T.flatMap(({ cookie }) => T.tryPromise(() => getSession(cookie))),
-        T.catchAll(() => T.promise(() => getSession()))
-      );
+    return yield* (
+      CookieSessionStorage.commitCodeVerifierAndNonceToSession({ authorizationUrl, codeVerifier, nonce })
+    )
 
-    session.set("code_verifier", codeVerifier);
-    session.set("nonce", nonce);
-    const cookie = yield* T.promise(() => commitSession(session));
-
-    return yield* ServerResponse.Redirect({
-      location: authorizationUrl,
-      headers: {
-        "Set-Cookie": cookie,
-      },
-    });
   })
 );

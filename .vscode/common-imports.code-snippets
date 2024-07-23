@@ -13,4 +13,11 @@
     ],
     "description": "Option as O"
   },
+  "Layer": {
+    "prefix": "+L",
+    "body": [
+      "import * as L from 'effect/Layer'"
+    ],
+    "description": "Record as R"
+  },
 }
