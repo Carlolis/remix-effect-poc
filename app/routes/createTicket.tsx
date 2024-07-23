@@ -46,9 +46,9 @@ export default function CreateTicketForm() {
     submit(values, { method: 'POST' })
   }
   return (
-    <div className="flex flex-col items-center justify-center h-screen ">
+    <div className="font-sans leading-5 mt-10 flex flex-col items-center justify-center">
       <ButtonGoBackHome />
-      <div className="text-2xl font-bold mb-4">- CREATE A TICKET -</div>
+      <div className="text-2xl font-bold mb-4 mt-2">- CREATE A TICKET -</div>
       <div className="mb-4">Hello {userInfo.preferred_username}, you can create a ticket</div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

@@ -6,7 +6,6 @@ import { makeZammadImplementation } from './ZammadImplementation'
 
 pipe(
   ticketServiceTest({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     multiTenant_twoUsersWithSameEmailInDifferentOrganizationsAllowed: false
   }),
   T.provide(

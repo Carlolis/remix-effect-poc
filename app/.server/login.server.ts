@@ -31,10 +31,6 @@ export const loader = Remix.loader(
       Sc.decodeUnknownOption(Sc.String),
       O.getOrUndefined
     )
-
-
-
-    yield* _(T.void)
     return userName ?? 'error'
   }).pipe(T.catchAll(() => T.succeed('error')))
 )

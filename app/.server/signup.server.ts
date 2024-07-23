@@ -5,25 +5,15 @@ import * as Sc from '@effect/schema/Schema'
 import { json, redirect } from '@remix-run/node'
 import { Effect as T, pipe } from 'effect'
 
+import { CreateUserForm } from '~/routes/signup'
 import { unwrapAction, unwrapLoader } from '../runtime/Remix'
 import { TicketService } from '../services/ticketService/TicketService'
-import { ProjectIdSchema } from '../services/userManagement/models/project/ProjectId'
 import { CreateUser } from '../services/userManagement/models/user/CreateUser'
 import { UserManagement } from '../services/userManagement/UserManagement'
 import { commitSession, getSession } from '../session'
 
-const RolesSchema = Sc.transform(
-  Sc.String,
-  Sc.Array(Sc.Literal('Admin', 'Customer')),
-  {
-    decode: a => a.split(',').map(a => a.trim()) as readonly ('Admin' | 'Customer')[],
-    encode: a => a.toString()
-  }
-)
 
-const CreateUserForm = Sc.extend(CreateUser)(
-  Sc.Struct({ roles: RolesSchema, projectId: ProjectIdSchema })
-)
+
 
 export const action = unwrapAction(
   T.gen(function* (_) {
