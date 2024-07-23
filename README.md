@@ -70,3 +70,7 @@ bun test-vite
 ### Notion Links
 
 - [Notion POC link](https://www.notion.so/POC-integration-6d23d648b833416bb9e1a9dc503f2443?pvs=4)
+
+### Production
+
+See [PRODUCTION.md](PRODUCTION.md)
