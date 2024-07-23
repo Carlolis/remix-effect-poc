@@ -12,7 +12,7 @@ fi
 # echo "Npm i" && npm i
 # echo "Check Dedupe.." && npm dedupe
 
-echo "linting.." && bun run lint
+echo "Linting.." && bun run lint
 echo "Typechecking.." && bun run typecheck
-echo "building.." && bun run build
+echo "Building.." && bun run build
 echo "PrePush Done!"

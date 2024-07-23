@@ -2,7 +2,6 @@ import { HttpServer } from '@effect/platform'
 import * as Sc from '@effect/schema/Schema'
 import { redirect } from '@remix-run/node'
 import { Effect as T, pipe } from 'effect'
-import { getValidatedFormData } from 'remix-hook-form'
 import { TicketCreationForm } from '~/routes/createTicket'
 import { JwtUserInfo } from '../routes/callback'
 import { Remix } from '../runtime/Remix'
@@ -53,8 +52,6 @@ export const action = Remix.action(
         headers.cookie
       )
     ))
-
-    getValidatedFormData
 
     const userInfo = yield* _(pipe(session.get('user_info'), Sc.decodeUnknown(JwtUserInfo)))
 
