@@ -6,11 +6,12 @@ import * as O from 'effect/Option'
 import type { Config } from 'unique-names-generator'
 import { names, uniqueNamesGenerator } from 'unique-names-generator'
 import { afterAll, describe, expect } from 'vitest'
-
+import * as Sc from '@effect/schema/Schema'
 import type { CreateApplication } from './models/application/CreateApplication'
 import type { ProjectId } from './models/project/ProjectId'
 import type { CreateUser } from './models/user/CreateUser'
 import { UserManagement } from './UserManagement'
+import { Email } from '~/runtime/models/Email'
 
 const uniqueNamesCustomConfig = {
   dictionaries: [names, names],
@@ -52,7 +53,7 @@ export const userManagementTest = T.gen(function* (_) {
     const createRandomUser = (config: Config): CreateUser => {
       const name = uniqueTestNamesGenerator(config)
       return {
-        email: `${name}@email.com`,
+        email: Sc.decodeSync(Email)(`${name}@email.com`),
         firstName: name,
         lastName: uniqueTestNamesGenerator(config),
         password: 'password1@A',
