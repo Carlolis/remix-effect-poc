@@ -2,15 +2,15 @@
 
 import { HttpServer } from '@effect/platform'
 import * as Sc from '@effect/schema/Schema'
-import { json, redirect } from '@remix-run/node'
-import { Effect as T, pipe } from 'effect'
+import { Effect as T } from 'effect'
 
 import { CreateUserForm } from '~/routes/signup'
+import { ServerResponse } from '~/runtime/ServerResponse'
+import { CookieSessionStorage } from '~/runtime/services/CookieSessionStorage'
 import { unwrapAction, unwrapLoader } from '../runtime/Remix'
 import { TicketService } from '../services/ticketService/TicketService'
 import { CreateUser } from '../services/userManagement/models/user/CreateUser'
 import { UserManagement } from '../services/userManagement/UserManagement'
-import { commitSession, getSession } from '../session'
 
 export const action = unwrapAction(
   T.gen(function* () {
@@ -40,29 +40,26 @@ export const action = unwrapAction(
         projectId,
         roles
       )
-      const headers = yield* HttpServer.request.schemaHeaders(
-        Sc.Struct({ cookie: Sc.String })
-      )
-      const session = yield* T.promise(() => getSession(headers.cookie))
-      session.set('username', createUser.userName)
-      const cookie = yield* T.promise(() => commitSession(session))
-      return redirect('/login', {
-        status: 301,
-        headers: {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          'Set-Cookie': cookie
-        }
-      })
+
+      return yield* CookieSessionStorage.commitUserName(createUser.userName)
     }).pipe(
       T.tapError(e => T.logError('CreateUserForm', e)),
-      T.catchAll(() => T.succeed('CreateUserForm error'))
+      T.catchTag('UserAlreadyExist', () =>
+        ServerResponse.Redirect({
+          location: '/signup'
+        })),
+      T.catchTag('PasswordNotEnoughStrong', () =>
+        ServerResponse.Redirect({
+          location: '/signup'
+        })),
+      T.catchTag('RequestError', () =>
+        ServerResponse.Redirect({
+          location: '/signup'
+        }))
     )
   })
 )
 
 export const loader = unwrapLoader(
-  pipe(
-    UserManagement,
-    T.map(userManagement => userManagement.getAllProjects.pipe(T.map(json)))
-  )
+  T.succeed(UserManagement.getAllProjects)
 )

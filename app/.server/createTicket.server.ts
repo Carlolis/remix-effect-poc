@@ -8,14 +8,12 @@ import { TicketService } from '../services/ticketService/TicketService'
 
 export const loader = Remix.unwrapLoader(
   T.succeed(
-    T.gen(function* () {
-      return yield* CookieSessionStorage.getUserInfo()
-    }).pipe(
-      T.catchAll(() =>
-        ServerResponse.Redirect({
-          location: '/notauthorize'
-        })
-      )
+    CookieSessionStorage.getUserInfo()
+  ).pipe(
+    T.catchAll(() =>
+      ServerResponse.Redirect({
+        location: '/notauthorize'
+      })
     )
   )
 )
@@ -28,11 +26,9 @@ export const action = Remix.action(
       TicketCreationForm
     )
 
-    const userInfo = yield* CookieSessionStorage.getUserInfo()
+    const { email } = yield* CookieSessionStorage.getUserInfo()
 
-    const userMail = userInfo.email
-
-    yield* (ticketService.createTicket(createTicket, userMail))
+    yield* (ticketService.createTicket(createTicket, email))
 
     return yield* (ServerResponse.Redirect({
       location: '/tickets'

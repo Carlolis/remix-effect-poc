@@ -9,10 +9,10 @@ export const loader = Remix.unwrapLoader(
     const ticketService = yield* TicketService
 
     return T.gen(function* () {
-      const userInfo = yield* CookieSessionStorage.getUserInfo()
+      const { email } = yield* CookieSessionStorage.getUserInfo()
 
-      yield* (T.logInfo('Ticket for user :', userInfo.email))
-      const tickets = yield* (ticketService.getAllTickets(userInfo.email))
+      yield* (T.logInfo('Ticket for user :', email))
+      const tickets = yield* (ticketService.getAllTickets(email))
       yield* (T.logInfo('Ticket :', tickets))
       return tickets
     })

@@ -14,11 +14,10 @@ export default function Screen() {
     <div className="font-sans leading-5 mt-10 flex flex-col items-center justify-center">
       <ButtonGoBackHome />
       <h1 className="text-2xl font-bold mt-10">- LOGIN -</h1>
-      {(userName) ?
+      {userName ?
         (
           <div className="font-bold mt-10">
-            Account created ! Hello {userName}{' '}
-            ! If your account is not activated, please check your email and Please log in !
+            Account created ! Hello {userName} ! Please check your email and Please log in !
           </div>
         ) :
         null}

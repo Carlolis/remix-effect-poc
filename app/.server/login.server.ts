@@ -6,24 +6,21 @@ import { UserManagement } from '../services/userManagement/UserManagement'
 // loader
 export const loader = Remix.unwrapLoader(
   T.succeed(
-    T.gen(function* () {
-      const userInfo = yield* CookieSessionStorage.getUserInfo()
-      return userInfo.preferred_username
-    }).pipe(T.catchAll(() => T.succeed(undefined)))
+    CookieSessionStorage.getUserName()
   )
 )
 
-export const action = Remix.action(
+export const action = Remix.unwrapAction(
   T.gen(function* () {
     T.log('action login')
     const userManagement = yield* UserManagement
 
     const { codeVerifier, nonce, authorizationUrl } = yield* userManagement.login
 
-    return yield* (CookieSessionStorage.commitCodeVerifierAndNonceToSession({
+    return CookieSessionStorage.commitCodeVerifierAndNonce({
       authorizationUrl,
       codeVerifier,
       nonce
-    }))
+    })
   })
 )
