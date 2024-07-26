@@ -3,22 +3,22 @@
 import { Form, useLoaderData } from '@remix-run/react'
 
 import { Button } from '~/components/ui/button'
+import { loader } from '../.server/login.server'
 import { ButtonGoBackHome } from '../components/buttonGoBackHome'
-
 export { action, loader } from '../.server/login.server'
-// names we are going to use in the strategy
+
 export default function Screen() {
-  const response = useLoaderData<{ userName: string | undefined }>()
+  const userName = useLoaderData<typeof loader>()
 
   return (
     <div className="font-sans leading-5 mt-10 flex flex-col items-center justify-center">
       <ButtonGoBackHome />
       <h1 className="text-2xl font-bold mt-10">- LOGIN -</h1>
-      {(response.userName) ?
+      {(userName) ?
         (
-          <div>
-            Account created ! Hello {response?.userName}{' '}
-            ! Please check your email and Please log in !
+          <div className="font-bold mt-10">
+            Account created ! Hello {userName}{' '}
+            ! If your account is not activated, please check your email and Please log in !
           </div>
         ) :
         null}

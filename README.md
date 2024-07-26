@@ -51,6 +51,10 @@ cd ../../
 
 Go to <http://localhost:8081/ui/console/projects> and login with the new password, create a new project.
 
+### Add "Admin" and "Customer" roles
+
+In the new project, create two new roles with the name and key "Admin" and "Customer"
+
 ### Create an application
 
 In the new project, create an application
@@ -77,6 +81,12 @@ And create a new machine user with default values
 Go to its "Personal Access Tokens" section and create a Personal Access Token. then copy paste it in your SystemEnvironmentVariables : ZITADEL_ACCESS_TOKEN
 
 IMPORTANT ⇒ add this machineUser as a Manager to give him more permissions (check: To add Managers) (<https://www.notion.so/tuto-dev-ZiTADEL-3d0ed032232d4e5ab90b66bb2ac3a128?pvs=4#2a3b0b4a29c44db4a985df2267477571>)
+
+
+
+### Optional for dev only lower the password policy
+
+Go to <http://localhost:8081/ui/console/instance?id=complexity> and lower the password policy
 
 ## 2 ZAMMAD
 
