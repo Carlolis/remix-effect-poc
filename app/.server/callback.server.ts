@@ -1,7 +1,7 @@
 import { HttpServer } from '@effect/platform'
 
 import * as Sc from '@effect/schema/Schema'
-import { Effect as T, unsafeCoerce } from 'effect'
+import { Effect as T, pipe, unsafeCoerce } from 'effect'
 import * as O from 'effect/Option'
 import jwt from 'jsonwebtoken'
 
@@ -19,18 +19,19 @@ export const loader = Remix.loader(
 
     const url = yield* HttpServer.request.ServerRequest
 
-    const client = yield* OpenIdClient
     // FIXME: this is a hack to get the request object
-    const params = client.callbackParams(unsafeCoerce(url))
+    const params = yield* OpenIdClient.callbackParams(unsafeCoerce(url))
 
     // Note: In a real-world scenario, validate the nonce against what was stored in the session or cookie
-    const tokenSet = yield* T.tryPromise(() =>
+    const tokenSet = yield* pipe(
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      client.callback(oidcConfig.redirect_uri, params, {
+      OpenIdClient.callback(oidcConfig.redirect_uri, params, {
         code_verifier: codeVerifier,
         nonce
-      })
-    ).pipe(T.tapError(e => T.logError(e)))
+      }),
+      T.flatMap(data => T.tryPromise(() => data)),
+      T.tapError(e => T.logError(e))
+    )
 
     yield* T.logInfo('tokenSet', nonce)
 
