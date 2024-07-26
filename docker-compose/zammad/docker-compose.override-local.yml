@@ -1,0 +1,19 @@
+---
+version: '3'
+
+services:
+
+  zammad-init:
+    image: zammad-local
+
+  zammad-nginx:
+    image: zammad-local
+
+  zammad-railsserver:
+    image: zammad-local
+
+  zammad-scheduler:
+    image: zammad-local
+
+  zammad-websocket:
+    image: zammad-local
