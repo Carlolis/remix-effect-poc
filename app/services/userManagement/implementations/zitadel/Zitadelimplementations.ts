@@ -53,7 +53,7 @@ export const makeZitadelImplementation: L.Layer<
     const defaultClient = yield* Http.client.Client;
 
     const clientWithBaseUrl = defaultClient.pipe(
-      Http.client.mapRequest(Http.request.prependUrl("http://localhost:8081")),
+      Http.client.mapRequest(Http.request.prependUrl("http://localhost:8084")),
       Http.client.mapRequest(
         Http.request.setHeader("Authorization", `Bearer ${TOKEN}`)
       ),
@@ -355,7 +355,7 @@ export const makeZitadelImplementation: L.Layer<
 
         const clientAuth1 = defaultClient.pipe(
           Http.client.mapRequest(
-            Http.request.prependUrl("http://localhost:8081/auth/v1")
+            Http.request.prependUrl("http://localhost:8084/auth/v1")
           ),
           Http.client.mapRequest(
             Http.request.setHeader("Authorization", `Bearer ${token}`)
@@ -415,7 +415,7 @@ export const makeZitadelImplementation: L.Layer<
 
           const clientAuth1 = defaultClient.pipe(
             Http.client.mapRequest(
-              Http.request.prependUrl("http://localhost:8081/auth/v1")
+              Http.request.prependUrl("http://localhost:8084/auth/v1")
             ),
             Http.client.mapRequest(
               Http.request.setHeader("Authorization", `Bearer ${token}`)
@@ -550,7 +550,7 @@ export const makeZitadelImplementation: L.Layer<
       clientSecret,
     }) =>
       T.gen(function* () {
-        const tokenEndPoint = "http://localhost:8081/oauth/v2/token";
+        const tokenEndPoint = "http://localhost:8084/oauth/v2/token";
         const data = {
           grant_type: "client_credentials",
           scope: `openid profile email urn:zitadel:iam:org:project:id:${projectId}:aud`,

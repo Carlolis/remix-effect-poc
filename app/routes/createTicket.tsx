@@ -1,6 +1,6 @@
 import * as Sc from '@effect/schema/Schema'
 import { effectTsResolver } from '@hookform/resolvers/effect-ts'
-import { useLoaderData, useSubmit } from '@remix-run/react'
+import { useLoaderData, useSubmit } from 'react-router';
 import { useForm } from 'react-hook-form'
 import { Button } from '~/components/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel,

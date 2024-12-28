@@ -1,4 +1,4 @@
-import { useLoaderData } from '@remix-run/react'
+import { useLoaderData } from 'react-router';
 import { pipe } from 'effect'
 import * as O from 'effect/Option'
 import type { loader } from '../.server/tickets.server'

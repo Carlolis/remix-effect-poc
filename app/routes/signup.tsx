@@ -1,5 +1,5 @@
 import * as Sc from '@effect/schema/Schema'
-import { useLoaderData, useSubmit } from '@remix-run/react'
+import { useLoaderData, useSubmit } from 'react-router';
 import { pipe } from 'effect'
 import * as O from 'effect/Option'
 

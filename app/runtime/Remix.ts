@@ -1,37 +1,36 @@
-import type * as FileSystem from '@effect/platform/FileSystem'
-import type * as Path from '@effect/platform/Path'
-import type { ParseError, Unexpected } from '@effect/schema/ParseResult'
-import type { TypedDeferredData, TypedResponse } from '@remix-run/node'
-import { json, unstable_defineAction, unstable_defineLoader } from '@remix-run/node'
-import type { Params as RemixParams } from '@remix-run/react'
+import type * as FileSystem from '@effect/platform/FileSystem';
+import type * as Path from '@effect/platform/Path';
+import type { ParseError, Unexpected } from '@effect/schema/ParseResult';
+
 import type {
   Option,
   Ref,
   Scope
-} from 'effect'
+} from 'effect';
 import {
   Cause,
   Context,
-  Effect as T,
   Exit,
   Layer,
   ManagedRuntime,
-  Match
-} from 'effect'
-import type { NoSuchElementException } from 'effect/Cause'
+  Match,
+  Effect as T
+} from 'effect';
+import type { NoSuchElementException } from 'effect/Cause';
+import type { ActionFunctionArgs, LoaderFunctionArgs, Params as RemixParams } from 'react-router';
 
-import { ResponseHeaders } from './ResponseHeaders'
-import { AppLayer } from './Runtime'
+import { ResponseHeaders } from './ResponseHeaders';
+import { AppLayer } from './Runtime';
 
-import type { HttpServer } from '@effect/platform'
+import type { HttpServer } from '@effect/platform';
 
+import { fromWeb, ServerRequest } from '@effect/platform/Http/ServerRequest';
 import {
   type FormError,
   type NotFound,
   type Redirect,
-} from './ServerResponse'
-import { fromWeb, ServerRequest } from '@effect/platform/Http/ServerRequest'
-import { CookieSessionStorage } from './services/CookieSessionStorage'
+} from './ServerResponse';
+import { CookieSessionStorage } from './services/CookieSessionStorage';
 
 // import { OAuth } from "./internals/oauth/OAuth";
 
@@ -78,8 +77,8 @@ type RemixLoaderHandler<A extends Serializable, R,> = T.Effect<
 >
 type DataFunctionReturnValue =
   | Serializable
-  | TypedDeferredData<Record<string, unknown>>
-  | TypedResponse<Record<string, unknown>>
+  // | TypedDeferredData<Record<string, unknown>>
+  // | TypedResponse<Record<string, unknown>>
 type Serializable =
   | undefined
   | null
@@ -101,11 +100,11 @@ type Serializable =
   | Promise<Serializable>
   | object
 
-type RemixLoader = Parameters<typeof unstable_defineLoader>[0]
-type LoaderArgs = Parameters<RemixLoader>[0]
 
-type RemixAction = Parameters<typeof unstable_defineAction>[0]
-type ActionArgs = Parameters<RemixAction>[0]
+type LoaderArgs = LoaderFunctionArgs
+
+
+type ActionArgs = ActionFunctionArgs
 
 const makeRequestContext = (
   args: LoaderArgs | ActionArgs
@@ -137,19 +136,22 @@ const handleFailedResponse = <E extends Serializable,>(cause: Cause.Cause<E>) =>
 export const action = <A extends DataFunctionReturnValue, R extends AppEnv | RequestEnv,>(
   effect: RemixActionHandler<A, R>
 ) =>
-  unstable_defineAction(args => {
+  ((args:ActionFunctionArgs) => {
+
     const runnable = effect.pipe(
       T.tapError(e =>
         T.sync(() =>
           matchActionError({
-            Unexpected: () => (args.response.status = 500),
-            FormError: () => (args.response.status = 400),
-            Redirect(e) {
-              args.response.status = 302
-              args.response.headers.set('Location', e.location)
-              args.response.headers.set('Set-Cookie', e.headers?.['Set-Cookie'] ?? '')
-            },
-            ParseError: () => (args.response.status = 400)
+            Unexpected: () => Response.json({status : 500}),
+            FormError: () => Response.json({status : 500}),
+            Redirect:()=>
+            Response.json({status : 500}),
+            // {
+            //   args.response.status = 302
+            //   args.response.headers.set('Location', e.location)
+            //   args.response.headers.set('Set-Cookie', e.headers?.['Set-Cookie'] ?? '')
+            // },
+            ParseError: () => Response.json({status : 500})
           })(e)
         )
       ),
@@ -169,19 +171,23 @@ export const action = <A extends DataFunctionReturnValue, R extends AppEnv | Req
 export const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
   effect: RemixLoaderHandler<A, R>
 ) =>
-  // @ts-expect-error toto
-  unstable_defineLoader(args => {
+
+  ((args:LoaderFunctionArgs) => {
     const runnable = effect.pipe(
       T.tapError(e =>
         T.sync(() =>
           matchLoaderError({
-            Unexpected: () => (args.response.status = 500),
-            NotFound: () => (args.response.status = 404),
-            Redirect(e) {
-              args.response.status = 302
-              args.response.headers.set('Location', e.location)
-            },
-            NoSuchElementException: () => (args.response.status = 500)
+            Unexpected: () => Response.json({status : 500}),
+            
+            Redirect:()=>
+            Response.json({status : 500}),
+            // {
+            //   args.response.status = 302
+            //   args.response.headers.set('Location', e.location)
+            //   args.response.headers.set('Set-Cookie', e.headers?.['Set-Cookie'] ?? '')
+            // },
+            NoSuchElementException: () => Response.json({status : 500}),
+            NotFound: () => Response.json({status : 500}),
           })(e)
         )
       ),
@@ -194,9 +200,9 @@ export const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
     return runtime.runPromise(runnable).then(
       Exit.getOrElse(cause => {
         if (Cause.isFailType(cause)) {
-          throw json(cause.error.toString, {
-            status: args.response.status || 500,
-            headers: args.response.headers
+          throw Response.json(cause.error.toString, {
+            status:  500,
+            headers: undefined
           })
         }
 
@@ -217,7 +223,7 @@ export const unwrapLoader = <
 
   return (args: LoaderArgs): Promise<A1> => {
 
-    // @ts-expect-error fffff
+  
     return awaitedHandler.then(handler => handler(args))
   }
 }

@@ -1,5 +1,5 @@
 import * as Sc from '@effect/schema/Schema'
-import { useLoaderData } from '@remix-run/react'
+import { useLoaderData } from 'react-router';
 import { pipe } from 'effect'
 
 import { CustomButton } from '~/components/CustomButton'

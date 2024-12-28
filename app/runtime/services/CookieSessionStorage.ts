@@ -1,7 +1,7 @@
 import { HttpServer } from '@effect/platform'
 import * as Sc from '@effect/schema/Schema'
 import { formatErrorSync } from '@effect/schema/TreeFormatter'
-import { json, TypedResponse } from '@remix-run/node'
+//import { json, TypedResponse } from 'react-router';
 import { Effect as T, pipe } from 'effect'
 import type { Tag } from 'effect/Context'
 import * as L from 'effect/Layer'
@@ -12,7 +12,7 @@ import { NotAuthenticated } from '../models/NotAuthenticatedError'
 import { Redirect, ServerResponse } from '../ServerResponse'
 
 export class CookieSessionStorage extends T.Tag('CookieSessionStorage')<CookieSessionStorage, {
-  commitUserInfo(userInfo: JwtUserInfo): T.Effect<TypedResponse, Redirect>
+  commitUserInfo(userInfo: JwtUserInfo): T.Effect<Response, Redirect>
   getUserName(): T.Effect<string | null>
   getUserInfo(): T.Effect<JwtUserInfo, Redirect>
   commitUserName(userName: string): T.Effect<never, Redirect>
@@ -54,7 +54,8 @@ export class CookieSessionStorage extends T.Tag('CookieSessionStorage')<CookieSe
 
             const cookie = yield* _(T.promise(() => commitSession(session)))
 
-            return json(userInfo, {
+            return Response.json( {
+              body:userInfo,
               headers: {
                 // eslint-disable-next-line @typescript-eslint/naming-convention
                 'Set-Cookie': cookie

@@ -29,7 +29,7 @@ export const loader = Remix.loader(
         code_verifier: codeVerifier,
         nonce
       }),
-      T.flatMap(data => T.tryPromise(() => data)),
+      // T.flatMap(data => T.tryPromise(() => data)),
       T.tapError(e => T.logError(e))
     )
 
