@@ -35,11 +35,11 @@ See : <https://www.notion.so/tuto-dev-Zitadel-and-Zammad-3c57a95a09b144f6b387783
 
 ### Change back the ZITADEL port to 8081
 
-First change the 8080 zitadel port to 8081 in the docker-compose.yml file (line 17)
+Change the 8080 zitadel port to 8081 in the docker-compose.yml file (line 17)
 
 ### Run again ZITADEL with docker-compose
 
-Run the following commands:
+Run again the following commands:
 
 ```bash
 cd docker-compose/zitadel

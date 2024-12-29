@@ -4,7 +4,7 @@ import type { BaseClient } from 'openid-client'
 import { Issuer } from 'openid-client'
 
 export const oidcConfig = {
-  issuer: 'http://localhost:8084',
+  issuer: 'http://localhost:8081',
   client_secret: 'your-client-secret',
   redirect_uri: 'http://localhost:4200/callback'
 }
