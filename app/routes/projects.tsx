@@ -4,11 +4,12 @@ import * as O from 'effect/Option'
 
 import type { loader } from '../.server/projects.server'
 import { ButtonGoBackHome } from '../components/buttonGoBackHome'
+import { Route } from '../+types/root';
 
 export { loader } from '../.server/projects.server'
-export default function Projects() {
+export default function Projects({ loaderData }: Route.ComponentProps) {
   const projects = pipe(useLoaderData<typeof loader>(), O.fromNullable)
-
+  
   return (
     <div className="font-sans leading-5 mt-10 flex flex-col items-center justify-center">
       <ButtonGoBackHome />

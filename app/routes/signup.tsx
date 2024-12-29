@@ -29,6 +29,7 @@ import { CreateUser } from '~/services/userManagement/models/user/CreateUser'
 import { ButtonGoBackHome } from '../components/buttonGoBackHome'
 import type { Project } from '../services/userManagement/models/project/Project'
 import { ProjectIdSchema } from '../services/userManagement/models/project/ProjectId'
+import { Route } from './+types/signup';
 export { action, loader } from '../.server/signup.server'
 
 export const CreateUserForm = Sc.extend(CreateUser)(
@@ -37,10 +38,11 @@ export const CreateUserForm = Sc.extend(CreateUser)(
 
 export type CreateUserForm = Sc.Schema.Type<typeof CreateUserForm>
 
-export default function Signup() {
+export default function Signup({ loaderData }: Route.ComponentProps) {
   const form = useForm<CreateUserForm>({
     resolver: effectTsResolver(CreateUserForm)
   })
+  console.log("loaderData", loaderData)
 
   const projects = pipe(useLoaderData<Project[]>(), O.fromNullable, O.getOrElse(() => []))
 

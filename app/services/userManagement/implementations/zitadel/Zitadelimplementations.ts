@@ -47,6 +47,7 @@ export const makeZitadelImplementation: L.Layer<
     const client = yield* OpenIdClient;
     const TOKEN = yield* pipe(
       Config.string("ZITADEL_ACCESS_TOKEN"),
+      T.tap(T.log),
       T.catchAll(T.die)
     );
     // const PROJECT_ID = yield* pipe(Config.string('ZITADEL_PROJECT_ID'), T.catchAll(T.die))
@@ -736,7 +737,7 @@ export const makeZitadelImplementation: L.Layer<
           T.scoped
         );
 
-    const getAllProjects: UserManagementService["getAllProjects"] = T.gen(
+    const getAllProjects: UserManagementService["getAllProjects"] = ()=>T.gen(
       function* () {
         const body = yield* Http.body.json({
           query: {
@@ -753,10 +754,12 @@ export const makeZitadelImplementation: L.Layer<
         const response = yield* clientManagement(request);
 
         const responseInJson = yield* response.json;
-
+        console.log("responseInJson", responseInJson);
         const projectsFromZitadel = yield* pipe(
           responseInJson,
+          
           Sc.decodeUnknown(ProjectResponse),
+          T.tap(T.logInfo),
           T.tapError(() => T.logError(responseInJson))
         );
 

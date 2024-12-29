@@ -25,7 +25,7 @@ export class UserManagement extends T.Tag('UserManagement')<UserManagement, {
   createProject(project: CreateProject): T.Effect<ProjectId>
   addProjectRoles(roles: ReadonlyArray<Role>, projectId: ProjectId): T.Effect<void>
   getProjectRoles(projectId: ProjectId): T.Effect<ReadonlyArray<Role>>
-  getAllProjects: T.Effect<Project[]>
+  getAllProjects: ()=>T.Effect<Project[]>
   createApplication(application: CreateApplication): T.Effect<ApplicationId>
   createUser(user: CreateUser): T.Effect<UserOutputDTO, UserAlreadyExist | PasswordNotEnoughStrong>
   createUserMachine(user: CreateUserMachine): T.Effect<UserOutputDTO, UserAlreadyExist>

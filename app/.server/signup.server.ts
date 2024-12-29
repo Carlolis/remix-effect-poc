@@ -61,5 +61,5 @@ export const action = unwrapAction(
 )
 
 export const loader = unwrapLoader(
-  T.succeed(UserManagement.getAllProjects)
+  T.succeed(UserManagement.getAllProjects())
 )
