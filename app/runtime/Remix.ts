@@ -1,36 +1,36 @@
-import type * as FileSystem from '@effect/platform/FileSystem';
-import type * as Path from '@effect/platform/Path';
-import type { ParseError, Unexpected } from '@effect/schema/ParseResult';
+import type * as FileSystem from '@effect/platform/FileSystem'
+import type * as Path from '@effect/platform/Path'
+import type { ParseError, Unexpected } from '@effect/schema/ParseResult'
 
 import type {
   Option,
   Ref,
   Scope
-} from 'effect';
+} from 'effect'
 import {
   Cause,
   Context,
+  Effect as T,
   Exit,
   Layer,
   ManagedRuntime,
-  Match,
-  Effect as T
-} from 'effect';
-import type { NoSuchElementException } from 'effect/Cause';
-import type { ActionFunctionArgs, LoaderFunctionArgs, Params as RemixParams } from 'react-router';
+  Match
+} from 'effect'
+import type { NoSuchElementException } from 'effect/Cause'
+import type { ActionFunctionArgs, LoaderFunctionArgs, Params as RemixParams } from 'react-router'
 
-import { ResponseHeaders } from './ResponseHeaders';
-import { AppLayer } from './Runtime';
+import { ResponseHeaders } from './ResponseHeaders'
+import { AppLayer } from './Runtime'
 
-import type { HttpServer } from '@effect/platform';
+import type { HttpServer } from '@effect/platform'
 
-import { fromWeb, ServerRequest } from '@effect/platform/Http/ServerRequest';
+import { fromWeb, ServerRequest } from '@effect/platform/Http/ServerRequest'
 import {
   type FormError,
   type NotFound,
-  type Redirect,
-} from './ServerResponse';
-import { CookieSessionStorage } from './services/CookieSessionStorage';
+  type Redirect
+} from './ServerResponse'
+import { CookieSessionStorage } from './services/CookieSessionStorage'
 
 // import { OAuth } from "./internals/oauth/OAuth";
 
@@ -75,10 +75,9 @@ type RemixLoaderHandler<A extends Serializable, R,> = T.Effect<
   LoaderError,
   R | AppEnv | RequestEnv
 >
-type DataFunctionReturnValue =
-  | Serializable
-  // | TypedDeferredData<Record<string, unknown>>
-  // | TypedResponse<Record<string, unknown>>
+type DataFunctionReturnValue = Serializable
+// | TypedDeferredData<Record<string, unknown>>
+// | TypedResponse<Record<string, unknown>>
 type Serializable =
   | undefined
   | null
@@ -100,9 +99,7 @@ type Serializable =
   | Promise<Serializable>
   | object
 
-
 type LoaderArgs = LoaderFunctionArgs
-
 
 type ActionArgs = ActionFunctionArgs
 
@@ -119,8 +116,6 @@ const makeRequestContext = (
   return context
 }
 
-
-
 const matchLoaderError = Match.typeTags<Redirect | NotFound | Unexpected | NoSuchElementException>()
 
 const matchActionError = Match.typeTags<ActionError>()
@@ -135,81 +130,76 @@ const handleFailedResponse = <E extends Serializable,>(cause: Cause.Cause<E>) =>
 
 export const action = <A extends DataFunctionReturnValue, R extends AppEnv | RequestEnv,>(
   effect: RemixActionHandler<A, R>
-) =>
-  ((args:ActionFunctionArgs) => {
+) => ((args: ActionFunctionArgs) => {
+  const runnable = effect.pipe(
+    T.tapError(e =>
+      T.sync(() =>
+        matchActionError({
+          Unexpected: () => Response.json({ status: 500 }),
+          FormError: () => Response.json({ status: 400 }),
+          Redirect: e => {
+            const response = Response.json({
+              status: 302
+            })
+            response.headers.set('Location', e.location)
+            response.headers.append('Set-Cookie', e.headers?.['Set-Cookie'] ?? '')
+            return response
+          },
+          ParseError: () => Response.json({ status: 400 })
+        })(e)
+      )
+    ),
+    T.catchTag('FormError', e => T.succeed(e.toJSON())), // TODO: map FormError to ErrorResponse
+    T.provide(CookieSessionStorage.layer),
+    T.provide(makeRequestContext(args)),
+    T.scoped,
+    T.exit
+  )
 
-    const runnable = effect.pipe(
-      T.tapError(e =>
-        T.sync(() =>
-          matchActionError({
-            Unexpected: () => Response.json({status : 500}),
-            FormError: () => Response.json({status : 500}),
-            Redirect:()=>
-            Response.json({status : 500}),
-            // {
-            //   args.response.status = 302
-            //   args.response.headers.set('Location', e.location)
-            //   args.response.headers.set('Set-Cookie', e.headers?.['Set-Cookie'] ?? '')
-            // },
-            ParseError: () => Response.json({status : 500})
-          })(e)
-        )
-      ),
-      T.catchTag('FormError', e => T.succeed(e.toJSON())), // TODO: map FormError to ErrorResponse
-
-      T.provide(CookieSessionStorage.layer),
-      T.provide(makeRequestContext(args)),
-      T.scoped,
-      T.exit
-    )
-
-    return runtime.runPromise(runnable).then(Exit.getOrElse(handleFailedResponse)) as Promise<
-      FormError
-    >
-  })
+  return runtime.runPromise(runnable).then(Exit.getOrElse(handleFailedResponse)) as Promise<
+    FormError
+  >
+})
 
 export const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
   effect: RemixLoaderHandler<A, R>
-) =>
+) => ((args: LoaderFunctionArgs) => {
+  const runnable = effect.pipe(
+    T.tapError(e =>
+      T.sync(() =>
+        matchLoaderError({
+          Unexpected: () => Response.json({ status: 500 }),
 
-  ((args:LoaderFunctionArgs) => {
-    const runnable = effect.pipe(
-      T.tapError(e =>
-        T.sync(() =>
-          matchLoaderError({
-            Unexpected: () => Response.json({status : 500}),
-            
-            Redirect:()=>
-            Response.json({status : 500}),
-            // {
-            //   args.response.status = 302
-            //   args.response.headers.set('Location', e.location)
-            //   args.response.headers.set('Set-Cookie', e.headers?.['Set-Cookie'] ?? '')
-            // },
-            NoSuchElementException: () => Response.json({status : 500}),
-            NotFound: () => Response.json({status : 500}),
-          })(e)
-        )
-      ),
-      T.scoped,
-      T.provide(CookieSessionStorage.layer),
-      T.provide(makeRequestContext(args)),
-      T.exit
-    )
+          Redirect: () => Response.json({ status: 500 }),
+          // {
+          //   args.response.status = 302
+          //   args.response.headers.set('Location', e.location)
+          //   args.response.headers.set('Set-Cookie', e.headers?.['Set-Cookie'] ?? '')
+          // },
+          NoSuchElementException: () => Response.json({ status: 500 }),
+          NotFound: () => Response.json({ status: 500 })
+        })(e)
+      )
+    ),
+    T.scoped,
+    T.provide(CookieSessionStorage.layer),
+    T.provide(makeRequestContext(args)),
+    T.exit
+  )
 
-    return runtime.runPromise(runnable).then(
-      Exit.getOrElse(cause => {
-        if (Cause.isFailType(cause)) {
-          throw Response.json(cause.error.toString, {
-            status:  500,
-            headers: undefined
-          })
-        }
+  return runtime.runPromise(runnable).then(
+    Exit.getOrElse(cause => {
+      if (Cause.isFailType(cause)) {
+        throw Response.json(cause.error.toString, {
+          status: 500,
+          headers: undefined
+        })
+      }
 
-        throw Cause.pretty(cause)
-      })
-    ) as Promise<A>
-  })
+      throw Cause.pretty(cause)
+    })
+  ) as Promise<A>
+})
 
 export const unwrapLoader = <
   A1 extends Serializable,
@@ -222,8 +212,6 @@ export const unwrapLoader = <
   const awaitedHandler = runtime.runPromise(effect).then(loader)
 
   return (args: LoaderArgs): Promise<A1> => {
-
-  
     return awaitedHandler.then(handler => handler(args))
   }
 }
