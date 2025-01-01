@@ -126,30 +126,30 @@ bun dev
 
 sequenceDiagram
     participant User as User
-    participant RemixAppFront as Remix Frontend App
-    participant RemixAppBack as Remix Backend API
+    participant ReactRouterv7AppFront as ReactRouterv7 Frontend App
+    participant ReactRouterv7AppBack as ReactRouterv7 Backend API
     participant IdP as Identity Provider (IdP)
 
-User->>RemixAppFront: GET <https://app.example.com>
-RemixAppFront->>User: 401 Unauthorized (no session or token)
+User->>ReactRouterv7AppFront: GET <https://app.example.com>
+ReactRouterv7AppFront->>User: 401 Unauthorized (no session or token)
 
-User->>RemixAppFront: Click "Login"
-RemixAppFront->>IdP: GET <https://idp.example.com/auth?client_id=CLIENT123&redirect_uri=https://app.example.com/callback&scope=openid> profile&response_type=code&state=RANDOM_STATE123
+User->>ReactRouterv7AppFront: Click "Login"
+ReactRouterv7AppFront->>IdP: GET <https://idp.example.com/auth?client_id=CLIENT123&redirect_uri=https://app.example.com/callback&scope=openid> profile&response_type=code&state=RANDOM_STATE123
 User->>IdP: POST credentials to <https://idp.example.com/auth>
 
 Note over IdP: Validates user credentials
 
 IdP->>User: 302 Redirect to <https://app.example.com/callback?code=AUTHCODE456&state=RANDOM_STATE123>
-User->>RemixAppFront: GET <https://app.example.com/callback?code=AUTHCODE456&state=RANDOM_STATE123>
-RemixAppFront->>RemixAppBack: POST code, state, redirect_uri to <https://api.example.com/exchange_code>
+User->>ReactRouterv7AppFront: GET <https://app.example.com/callback?code=AUTHCODE456&state=RANDOM_STATE123>
+ReactRouterv7AppFront->>ReactRouterv7AppBack: POST code, state, redirect_uri to <https://api.example.com/exchange_code>
 
-RemixAppBack->>IdP: POST <https://idp.example.com/token> with code=AUTHCODE456, client_id=CLIENT123, client_secret=SECRET789, redirect_uri=<https://app.example.com/callback>, grant_type=authorization_code
-IdP->>RemixAppBack: 200 OK with access token=ACCESSTOKEN012, ID token=IDTOKEN034, expiry
+ReactRouterv7AppBack->>IdP: POST <https://idp.example.com/token> with code=AUTHCODE456, client_id=CLIENT123, client_secret=SECRET789, redirect_uri=<https://app.example.com/callback>, grant_type=authorization_code
+IdP->>ReactRouterv7AppBack: 200 OK with access token=ACCESSTOKEN012, ID token=IDTOKEN034, expiry
 
-RemixAppBack->>RemixAppFront: 200 OK, Set-Cookie: session=SESSIONXYZ or send tokens
-RemixAppFront->>User: 200 OK, Display authenticated state
+ReactRouterv7AppBack->>ReactRouterv7AppFront: 200 OK, Set-Cookie: session=SESSIONXYZ or send tokens
+ReactRouterv7AppFront->>User: 200 OK, Display authenticated state
 
-Note over RemixAppFront,RemixAppBack: Optional: Refresh token mechanism can be implemented for long-term sessions
+Note over ReactRouterv7AppFront,ReactRouterv7AppBack: Optional: Refresh token mechanism can be implemented for long-term sessions
 
 ### Run tests with bun
 
