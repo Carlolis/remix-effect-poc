@@ -90,7 +90,7 @@ Go to <http://localhost:8081/ui/console/instance?id=complexity> and lower the pa
 
 ## 2 ZAMMAD
 
-### Run ZAMMAD with docker-compose
+### Run ZAMMAD with docker-compose !
 
 ```bash
 cd docker-compose/zammad
