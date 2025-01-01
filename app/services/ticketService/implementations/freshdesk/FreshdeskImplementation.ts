@@ -1,50 +1,45 @@
-import * as Http from "@effect/platform/HttpClient";
-import * as Sc from "@effect/schema/Schema";
-import { Config, Effect as T, Layer as L, pipe } from "effect";
+import { Config, Effect as T, Layer as L, pipe, Schema as Sc } from 'effect'
 
-import type { OrganizationCreationDTO } from "../../models/organization/OrganizationCreationDTO";
-import type { TicketCreationDTO } from "../../models/ticket/TicketCreationDTO";
-import { TicketIdSchema } from "../../models/ticket/TicketId";
-import type { TicketOutputDTO } from "../../models/ticket/TicketOutputDTO";
-import type { TicketServiceService } from "../../TicketService";
-import { TicketService } from "../../TicketService";
-import type { FreshDeskTicket } from "./models/ticket/FreshDeskTicket";
-import { FreshDeskTicketOutput } from "./models/ticket/FreshDeskTicketOutput";
+import { HttpClient, HttpClientRequest } from '@effect/platform'
+import type { OrganizationCreationDTO } from '../../models/organization/OrganizationCreationDTO'
+import type { TicketCreationDTO } from '../../models/ticket/TicketCreationDTO'
+import { TicketIdSchema } from '../../models/ticket/TicketId'
+import type { TicketOutputDTO } from '../../models/ticket/TicketOutputDTO'
+import type { TicketServiceService } from '../../TicketService'
+import { TicketService } from '../../TicketService'
+import type { FreshDeskTicket } from './models/ticket/FreshDeskTicket'
+import { FreshDeskTicketOutput } from './models/ticket/FreshDeskTicketOutput'
 
 export const makeFreshdeskImplementation = L.effect(
   TicketService,
   T.gen(function* () {
-    const TOKEN = yield* Config.string("FRESHDESK_ACCESS_TOKEN").pipe(
+    const TOKEN = yield* Config.string('FRESHDESK_ACCESS_TOKEN').pipe(
       T.catchAll(T.die)
-    );
+    )
 
-    const defaultClient = yield* Http.client.Client;
+    const defaultClient = yield* HttpClient.HttpClient
 
     const clientWithBaseUrl = defaultClient.pipe(
-      Http.client.mapRequest(
-        Http.request.prependUrl("https://rebaze.freshdesk.com/")
+      HttpClient.mapRequest(
+        HttpClientRequest.prependUrl('https://rebaze.freshdesk.com/')
       ),
-      Http.client.mapRequest(Http.request.basicAuth(TOKEN, `x`)),
-      Http.client.mapRequest(
-        Http.request.setHeader("Content-Type", "application/json")
+      HttpClient.mapRequest(HttpClientRequest.basicAuth(TOKEN, `x`)),
+      HttpClient.mapRequest(
+        HttpClientRequest.setHeader('Content-Type', 'application/json')
       ),
-      Http.client.catchTags({
+      HttpClient.catchTags({
         RequestError: T.die,
-        ResponseError: T.die,
+        ResponseError: T.die
       })
-    );
+    )
 
     // -----------------------------------------------------------------------------------------
     // TICKET
 
     const clientTicket = pipe(
       clientWithBaseUrl,
-      Http.client.mapRequest(Http.request.prependUrl("/api/v2/tickets")),
-      Http.client.catchTags({
-        RequestError: T.die,
-        ResponseError: T.die,
-      })
-    );
+      HttpClient.mapRequest(HttpClientRequest.prependUrl('/api/v2/tickets'))
+    )
 
     const responseTicketOutputDTObuilder = (
       freshDeskTicketOutput: FreshDeskTicketOutput
@@ -54,80 +49,76 @@ export const makeFreshdeskImplementation = L.effect(
       ),
       title: freshDeskTicketOutput.subject,
       messages: [freshDeskTicketOutput.description_text],
-      priority:
-        freshDeskTicketOutput.priority === 4
-          ? ("urgent" as const)
-          : ("normal" as const),
-    });
+      priority: freshDeskTicketOutput.priority === 4 ? ('urgent' as const) : ('normal' as const)
+    })
 
-    const createTicket: TicketServiceService["createTicket"] = (
+    const createTicket: TicketServiceService['createTicket'] = (
       createTicket: TicketCreationDTO
     ) => {
       const freshTicket: FreshDeskTicket = {
         name: createTicket.name,
-        email: "notimplemented",
+        email: 'notimplemented',
         subject: createTicket.title,
         description: createTicket.message,
-        priority: createTicket.priority === "urgent" ? 4 : 2,
+        priority: createTicket.priority === 'urgent' ? 4 : 2,
         type: null,
-        status: 2,
-      };
+        status: 2
+      }
 
       return T.gen(function* () {
-        const body = yield* Http.body.json(freshTicket);
-        const postRequest = Http.request.post("", {
-          acceptJson: true,
-          body,
-        });
-        const response = yield* clientTicket(postRequest);
-        const responseJson = yield* response.json;
+        const body = HttpClientRequest.bodyJson(freshTicket)
+        const postRequest = yield* HttpClientRequest.post('').pipe(
+          body
+        )
+        const response = yield* clientTicket.execute(postRequest)
+        const responseJson = yield* response.json
 
         const createdTicket = yield* pipe(
           responseJson,
           Sc.decodeUnknown(FreshDeskTicketOutput),
           T.tapError(() => T.logError(responseJson))
-        );
+        )
 
-        return responseTicketOutputDTObuilder(createdTicket);
+        return responseTicketOutputDTObuilder(createdTicket)
       }).pipe(
         T.catchTags({
-          BodyError: T.die,
+          HttpBodyError: T.die,
           ParseError: T.die,
-          ResponseError: T.die,
+          ResponseError: T.die
         }),
         T.scoped
-      );
-    };
+      )
+    }
 
-    const getTicketById: TicketServiceService["getTicketById"] = (
+    const getTicketById: TicketServiceService['getTicketById'] = (
       ticketId: string
     ) =>
       T.gen(function* () {
-        const getRequest = Http.request.get(`/${ticketId}`);
-        const response = yield* clientTicket(getRequest);
-        const responseJson = yield* response.json;
+        const getRequest = HttpClientRequest.get(`/${ticketId}`)
+        const response = yield* clientTicket.execute(getRequest)
+        const responseJson = yield* response.json
 
         const getTicket = yield* pipe(
           responseJson,
           Sc.decodeUnknown(FreshDeskTicketOutput),
           T.tapError(() => T.logError(responseJson))
-        );
+        )
 
-        return responseTicketOutputDTObuilder(getTicket);
+        return responseTicketOutputDTObuilder(getTicket)
       }).pipe(
         T.catchTags({
           ParseError: T.die,
-          ResponseError: T.die,
+          ResponseError: T.die
         }),
         T.scoped
-      );
+      )
 
     // -----------------------------------------------------------------------------------------
     // ORGANIZATION
 
-    const createOrganization: TicketServiceService["createOrganization"] = (
+    const createOrganization: TicketServiceService['createOrganization'] = (
       createOrganization: OrganizationCreationDTO
-    ) => T.die(createOrganization);
+    ) => T.die(createOrganization)
 
     // -----------------------------------------------------------------------------------------
 
@@ -135,12 +126,12 @@ export const makeFreshdeskImplementation = L.effect(
       createTicket,
       getTicketById,
       createOrganization,
-      createCustomer: () => T.die("Not implemented"),
-      getAllOrganizations: T.die("Not implemented"),
-      getAllTickets: () => T.die("Not implemented"),
-      deleteAllOrganizationsExceptZammadFoundation: T.die("Not implemented"),
-      deleteAllTestCustomers: T.die("Not implemented"),
-      deleteAllTickets: T.die("Not implemented"),
-    });
+      createCustomer: () => T.die('Not implemented'),
+      getAllOrganizations: T.die('Not implemented'),
+      getAllTickets: () => T.die('Not implemented'),
+      deleteAllOrganizationsExceptZammadFoundation: T.die('Not implemented'),
+      deleteAllTestCustomers: T.die('Not implemented'),
+      deleteAllTickets: T.die('Not implemented')
+    })
   })
-);
+)

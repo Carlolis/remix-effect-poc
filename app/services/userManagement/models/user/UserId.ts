@@ -1,4 +1,4 @@
-import * as Sc from '@effect/schema/Schema'
+import { Schema as Sc } from 'effect'
 import * as B from 'effect/Brand'
 
 export type UserId = string & B.Brand<'UserId'>

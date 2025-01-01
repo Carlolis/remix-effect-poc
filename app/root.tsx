@@ -1,5 +1,4 @@
-import { LinksFunction } from 'react-router';
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
+import { Links, LinksFunction, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
 
 import stylesheet from '~/globals.css?url'
 

@@ -2,7 +2,7 @@
   "Schema": {
     "prefix": "+SC",
     "body": [
-      "import * as Sc from '@effect/schema/Schema'"
+      "import { Schema as Sc } from 'effect'"
     ],
     "description": "Schema as Sc"
   },

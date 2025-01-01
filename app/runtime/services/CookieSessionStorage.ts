@@ -1,8 +1,7 @@
-import { HttpServer } from '@effect/platform'
-import * as Sc from '@effect/schema/Schema'
-import { formatErrorSync } from '@effect/schema/TreeFormatter'
-//import { json, TypedResponse } from 'react-router';
-import { Effect as T, pipe } from 'effect'
+import { HttpServerRequest } from '@effect/platform'
+
+// import { json, TypedResponse } from 'react-router';
+import { Effect as T, pipe, Schema as Sc } from 'effect'
 import type { Tag } from 'effect/Context'
 import * as L from 'effect/Layer'
 import * as O from 'effect/Option'
@@ -28,8 +27,8 @@ export class CookieSessionStorage extends T.Tag('CookieSessionStorage')<CookieSe
   static make = () => {
     return T.gen(function* (_) {
       const optionalCookies: O.Option<string> = yield* _(
-        HttpServer.request.schemaHeaders(Sc.Struct({ cookie: Sc.String })),
-        T.mapError(e => NotAuthenticated.of(formatErrorSync(e))),
+        HttpServerRequest.schemaHeaders(Sc.Struct({ cookie: Sc.String })),
+        T.mapError(e => NotAuthenticated.of(e.message)),
         T.map(headers => O.some(headers.cookie)),
         T.tapError(e => T.logError(`CookieSessionStorage - get cookies for service`, e.message)),
         T.catchAll(() => T.succeed(O.none()))
@@ -54,8 +53,8 @@ export class CookieSessionStorage extends T.Tag('CookieSessionStorage')<CookieSe
 
             const cookie = yield* _(T.promise(() => commitSession(session)))
 
-            return Response.json( {
-              body:userInfo,
+            return Response.json({
+              body: userInfo,
               headers: {
                 // eslint-disable-next-line @typescript-eslint/naming-convention
                 'Set-Cookie': cookie
@@ -156,8 +155,10 @@ export class CookieSessionStorage extends T.Tag('CookieSessionStorage')<CookieSe
 
             const userInfo = yield* _(
               session.get('user_info'),
+              x => x,
               Sc.decodeUnknown(JwtUserInfo),
-              T.mapError(e => NotAuthenticated.of(formatErrorSync(e))),
+              x => x,
+              T.mapError(e => NotAuthenticated.of(e.message)),
               T.tapError(e => T.logError(`CookieSessionStorage - getUserInfo`, e)),
               T.catchAll(() =>
                 ServerResponse.Redirect({
@@ -192,7 +193,10 @@ export class CookieSessionStorage extends T.Tag('CookieSessionStorage')<CookieSe
       })
     })
   }
-  static layer = L.effect(CookieSessionStorage)(this.make())
+  // @ts-expect-error wtf
+  static layer: L.Layer<CookieSessionStorage, never, never> = L.effect(CookieSessionStorage)(
+    this.make()
+  )
 }
 
 export type CookieSessionStorageService = Tag.Service<typeof CookieSessionStorage>

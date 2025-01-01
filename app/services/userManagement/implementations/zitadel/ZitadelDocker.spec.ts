@@ -1,7 +1,7 @@
-import * as Http from '@effect/platform/HttpClient'
 import { Effect as T, Layer as L, pipe, unsafeCoerce } from 'effect'
 import type { BaseClient } from 'openid-client'
 
+import { FetchHttpClient } from '@effect/platform'
 import { userManagementTest } from '../../userManagement_spec'
 import { OpenIdClient } from './OidcClient'
 import { makeZitadelImplementation } from './Zitadelimplementations'
@@ -17,7 +17,7 @@ pipe(
   T.provide(
     makeZitadelImplementation
   ),
-  T.provide(Http.client.layer),
+  T.provide(FetchHttpClient.layer),
   T.provide(OpenIdClientLayerTest),
   T.runSync
 )

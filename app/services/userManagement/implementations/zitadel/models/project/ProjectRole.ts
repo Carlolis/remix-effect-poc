@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import * as Sc from '@effect/schema/Schema'
+import { Schema as Sc } from 'effect'
 
 export const ProjectRole = Sc.Struct({
   key: Sc.String,

@@ -1,7 +1,7 @@
-import * as Sc from '@effect/schema/Schema'
 import { effectTsResolver } from '@hookform/resolvers/effect-ts'
-import { useLoaderData, useSubmit } from 'react-router';
+import { Schema as Sc } from 'effect'
 import { useForm } from 'react-hook-form'
+import { useLoaderData, useSubmit } from 'react-router'
 import { Button } from '~/components/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel,
   FormMessage } from '~/components/ui/form'

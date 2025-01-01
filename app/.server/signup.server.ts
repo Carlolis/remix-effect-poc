@@ -1,8 +1,7 @@
 // First we create our UI with the form doing a POST and the inputs with the
 
-import { HttpServer } from '@effect/platform'
-import * as Sc from '@effect/schema/Schema'
-import { Effect as T } from 'effect'
+import { HttpServerRequest } from '@effect/platform'
+import { Effect as T, Schema as Sc } from 'effect'
 
 import { CreateUserForm } from '~/routes/signup'
 import { ServerResponse } from '~/runtime/ServerResponse'
@@ -19,7 +18,7 @@ export const action = unwrapAction(
     const ticketService = yield* TicketService
 
     return T.gen(function* () {
-      const createUserForm = yield* HttpServer.request.schemaBodyJson(
+      const createUserForm = yield* HttpServerRequest.schemaBodyJson(
         CreateUserForm
       )
 

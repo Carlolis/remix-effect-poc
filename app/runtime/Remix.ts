@@ -1,6 +1,5 @@
 import type * as FileSystem from '@effect/platform/FileSystem'
 import type * as Path from '@effect/platform/Path'
-import type { ParseError, Unexpected } from '@effect/schema/ParseResult'
 
 import type {
   Option,
@@ -22,9 +21,10 @@ import type { ActionFunctionArgs, LoaderFunctionArgs, Params as RemixParams } fr
 import { ResponseHeaders } from './ResponseHeaders'
 import { AppLayer } from './Runtime'
 
-import type { HttpServer } from '@effect/platform'
+import { HttpServerRequest } from '@effect/platform'
 
-import { fromWeb, ServerRequest } from '@effect/platform/Http/ServerRequest'
+import { fromWeb } from '@effect/platform/HttpServerRequest'
+import { ParseError, Unexpected } from 'effect/ParseResult'
 import {
   type FormError,
   type NotFound,
@@ -53,7 +53,7 @@ const ResponseStatus = Context.GenericTag<ResponseStatus, Ref.Ref<Option.Option<
 type AppEnv = Layer.Layer.Success<typeof AppLayer>
 
 type RequestEnv =
-  | HttpServer.request.ServerRequest
+  | HttpServerRequest.HttpServerRequest
   | FileSystem.FileSystem
   | Params
   | Scope.Scope
@@ -105,9 +105,9 @@ type ActionArgs = ActionFunctionArgs
 
 const makeRequestContext = (
   args: LoaderArgs | ActionArgs
-): Layer.Layer<ServerRequest | ResponseHeaders | Params, never, never> => {
+): Layer.Layer<HttpServerRequest.HttpServerRequest | ResponseHeaders | Params, never, never> => {
   const context = Context.empty().pipe(
-    Context.add(ServerRequest, fromWeb(args.request)),
+    Context.add(HttpServerRequest.HttpServerRequest, fromWeb(args.request)),
     Context.add(Params, args.params),
     Context.add(ResponseHeaders, args.request.headers),
     Layer.succeedContext
@@ -149,7 +149,8 @@ export const action = <A extends DataFunctionReturnValue, R extends AppEnv | Req
         })(e)
       )
     ),
-    T.catchTag('FormError', e => T.succeed(e.toJSON())), // TODO: map FormError to ErrorResponse
+    T.catchTag('FormError', e => T.succeed(e.toJSON())),
+    // TODO: map FormError to ErrorResponse
     T.provide(CookieSessionStorage.layer),
     T.provide(makeRequestContext(args)),
     T.scoped,

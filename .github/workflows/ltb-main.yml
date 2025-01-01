@@ -18,7 +18,17 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/install-dependencies
-      - run: bun lint
+      - run: bun run lint
+  typecheck:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout [main]
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/install-dependencies
+      - run: bun run typecheck
   build:
     timeout-minutes: 15
     runs-on: ubuntu-latest

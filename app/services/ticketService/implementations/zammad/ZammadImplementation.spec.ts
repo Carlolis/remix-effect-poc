@@ -1,6 +1,6 @@
-import * as Http from '@effect/platform/HttpClient'
 import { Effect as T, pipe } from 'effect'
 
+import { FetchHttpClient } from '@effect/platform'
 import { ticketServiceTest } from '../../TicketService_spec'
 import { makeZammadImplementation } from './ZammadImplementation'
 
@@ -11,6 +11,6 @@ pipe(
   T.provide(
     makeZammadImplementation
   ),
-  T.provide(Http.client.layer),
+  T.provide(FetchHttpClient.layer),
   T.runSync
 )

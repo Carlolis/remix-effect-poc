@@ -1,11 +1,10 @@
-import * as Sc from '@effect/schema/Schema'
-import { SchemaPrimitives } from '@rebaze-fr/util-effect-utils-next'
-import { pipe } from 'effect'
+import { pipe, Schema as Sc } from 'effect'
+import { StringFromStringOrNumber } from '../../../../../StringFromStringOrNumber'
 
 export const FreshDeskTicketIdBrand = Symbol('FreshDeskTicketId')
 
 export const FreshDeskTicketId = pipe(
-  SchemaPrimitives.StringFromStringOrNumber,
+  StringFromStringOrNumber,
   Sc.brand(FreshDeskTicketIdBrand)
 )
 

@@ -1,4 +1,4 @@
-import * as Sc from '@effect/schema/Schema'
+import { Schema as Sc } from 'effect'
 
 /**
  * @param name customer's name

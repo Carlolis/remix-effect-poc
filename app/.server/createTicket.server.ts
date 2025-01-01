@@ -1,4 +1,4 @@
-import { HttpServer } from '@effect/platform'
+import { HttpServerRequest } from '@effect/platform'
 import { Effect as T } from 'effect'
 import { TicketCreationForm } from '~/routes/createTicket'
 import { ServerResponse } from '~/runtime/ServerResponse'
@@ -22,7 +22,7 @@ export const action = Remix.action(
   T.gen(function* () {
     const ticketService = yield* TicketService
 
-    const createTicket = yield* HttpServer.request.schemaBodyForm(
+    const createTicket = yield* HttpServerRequest.schemaBodyForm(
       TicketCreationForm
     )
 

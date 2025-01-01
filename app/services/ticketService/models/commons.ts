@@ -1,3 +1,3 @@
-import * as Sc from '@effect/schema/Schema'
+import { Schema as Sc } from 'effect'
 
 export const TicketPrioritySchema = Sc.Literal('urgent', 'normal')

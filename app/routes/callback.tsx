@@ -1,6 +1,5 @@
-import * as Sc from '@effect/schema/Schema'
-import { useLoaderData } from 'react-router';
-import { pipe } from 'effect'
+import { pipe, Schema as Sc } from 'effect'
+import { useLoaderData } from 'react-router'
 
 import { CustomButton } from '~/components/CustomButton'
 import { Email } from '~/runtime/models/Email'

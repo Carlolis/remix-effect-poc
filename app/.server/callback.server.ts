@@ -1,7 +1,6 @@
-import { HttpServer } from '@effect/platform'
+import { HttpServerRequest } from '@effect/platform'
 
-import * as Sc from '@effect/schema/Schema'
-import { Effect as T, pipe, unsafeCoerce } from 'effect'
+import { Effect as T, pipe, Schema as Sc, unsafeCoerce } from 'effect'
 import * as O from 'effect/Option'
 import jwt from 'jsonwebtoken'
 
@@ -17,7 +16,7 @@ export const loader = Remix.loader(
   T.gen(function* () {
     const { codeVerifier, nonce } = yield* CookieSessionStorage.getCodeVerifierAndNonce()
 
-    const url = yield* HttpServer.request.ServerRequest
+    const url = yield* HttpServerRequest.HttpServerRequest
 
     // FIXME: this is a hack to get the request object
     const params = yield* OpenIdClient.callbackParams(unsafeCoerce(url))

@@ -1,4 +1,4 @@
-import * as Sc from '@effect/schema/Schema'
+import { Schema as Sc } from 'effect'
 
 export const CurrentUserProjectsWithRolesResponseZitadel = Sc.Struct({
   details: Sc.Struct({ totalResult: Sc.optional(Sc.NumberFromString) }),
