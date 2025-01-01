@@ -1,5 +1,4 @@
-import { Schema as Sc } from 'effect'
-import { pipe } from 'effect'
+import { pipe, Schema as Sc } from 'effect'
 
 export const ClientIdBrand = Symbol('ClientId')
 
