@@ -155,9 +155,7 @@ export class CookieSessionStorage extends T.Tag('CookieSessionStorage')<CookieSe
 
             const userInfo = yield* _(
               session.get('user_info'),
-              x => x,
               Sc.decodeUnknown(JwtUserInfo),
-              x => x,
               T.mapError(e => NotAuthenticated.of(e.message)),
               T.tapError(e => T.logError(`CookieSessionStorage - getUserInfo`, e)),
               T.catchAll(() =>

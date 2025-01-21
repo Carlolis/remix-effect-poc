@@ -1,4 +1,5 @@
-import { Links, LinksFunction, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
+import { Links, LinksFunction, Meta, Outlet, Scripts, ScrollRestoration,
+  useRouteError } from 'react-router'
 
 import stylesheet from '~/globals.css?url'
 
@@ -22,6 +23,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         {children}
         <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  )
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError()
+  console.error(error)
+  return (
+    <html lang="fr">
+      <head>
+        <title>Oh no!</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        {error}
         <Scripts />
       </body>
     </html>

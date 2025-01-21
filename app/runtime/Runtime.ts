@@ -1,5 +1,4 @@
 import {
-  Layer,
   Layer as L,
   Logger,
   LogLevel,
@@ -19,4 +18,4 @@ export const AppLayer = pipe(
   L.provideMerge(NodeFileSystem.layer),
   L.provideMerge(Path.layer),
   L.provide(FetchHttpClient.layer)
-).pipe(Layer.provide(Logger.minimumLogLevel(LogLevel.All)))
+).pipe(L.provide(Logger.minimumLogLevel(LogLevel.All)))
