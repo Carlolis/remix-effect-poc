@@ -40,7 +40,7 @@ export function ErrorBoundary() {
         <Links />
       </head>
       <body>
-        {error}
+        {/* add the UI you want your users to see */}
         <Scripts />
       </body>
     </html>
